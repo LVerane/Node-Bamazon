@@ -94,29 +94,36 @@ function restock() {
 }
 
 function newProduct() {
-    inquirer
-        .prompt([
-            {
-                name: "itemName",
-                message: "Please enter the name of the item you would like to add"
-            }, {
-                type: "list",
-                name: "department",
-                message: "Please select the department of the item you would like to add",
-                choices: ["Department AG", "Department BT", "Department FT", "Department PO", "Department LM"]
-            }, {
-                name: "price",
-                message: "Please enter the price for the item you would like to add"
-            }, {
-                name: "stock",
-                message: "Please enter the available stock of the item you would like to add"
-            }
-        ])
-        .then(function (answer) {
-            connection.query("INSERT INTO products (product, department, price, stock) VALUES (?, ?, ?, ?)", [answer.itemName, answer.department, answer.price, answer.stock], function (err) {
-                if (err) throw err;
-                console.log("New product " + answer.itemName + " successfully added to the store!")
-                viewProdcuts(true);
-            });
+    connection.query("SELECT department FROM departments", function (err, res) {
+        if (err) throw err;
+        var options = [];
+        res.forEach(element => {
+            options.push(element.department)
         });
+        inquirer
+            .prompt([
+                {
+                    name: "itemName",
+                    message: "Please enter the name of the item you would like to add"
+                }, {
+                    type: "list",
+                    name: "department",
+                    message: "Please select the department of the item you would like to add",
+                    choices: options
+                }, {
+                    name: "price",
+                    message: "Please enter the price for the item you would like to add"
+                }, {
+                    name: "stock",
+                    message: "Please enter the available stock of the item you would like to add"
+                }
+            ])
+            .then(function (answer) {
+                connection.query("INSERT INTO products (product, department, price, stock) VALUES (?, ?, ?, ?)", [answer.itemName, answer.department, answer.price, answer.stock], function (err) {
+                    if (err) throw err;
+                    console.log("New product " + answer.itemName + " successfully added to the store!")
+                    viewProdcuts(true);
+                });
+            });
+    });
 }

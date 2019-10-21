@@ -17,3 +17,15 @@ VALUES ("Item A", "Department AG", 10.55, 5), ("Item B", "Department AG", 8.45, 
 ("Item F", "Department FT", 149.95, 2), ("Item G", "Department FT", 199.95, 2), ("Item H", "Department PO", 3.15, 20), ("Item I", "Department LM", 27.35, 15), ("Item J", "Department LM", 2.75, 10);
 
 SELECT * FROM products;
+
+CREATE TABLE departments (
+  id INT NOT NULL AUTO_INCREMENT,
+  department VARCHAR(50) NOT NULL,
+  over_head_costs DECIMAL(10,2) DEFAULT 0,
+  PRIMARY KEY (id)
+);
+
+INSERT INTO departments (department, over_head_costs)
+VALUES ("Department AG", 85), ("Department BT", 1279.3), ("Department FT", 279.92), ("Department PO", 25.2), ("Department LM", 175.1);
+
+SELECT * FROM departments;
