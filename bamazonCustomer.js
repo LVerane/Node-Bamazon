@@ -12,17 +12,16 @@ var connection = mysql.createConnection({
 //Start
 selectRequest()
 
-function selectRequest(){
+function selectRequest() {
     connection.query("SELECT id, product, price, stock FROM products", function (err, res) {
         if (err) throw err;
-        askProduct(res)
+        console.table(res);
+        askProduct()
     });
 }
 
 
-function askProduct(dataArray) {
-    // console.log(dataArray)
-    console.table(dataArray);
+function askProduct() {
     inquirer
         .prompt([
             {
@@ -34,62 +33,64 @@ function askProduct(dataArray) {
             }
         ])
         .then(function (answer) {
-            var position = answer.itemID - 1;
+            //use the ID the user selected to make another call so it works with any array position
+            connection.query("SELECT price, stock, sold FROM products WHERE id = ?", [answer.itemID], function (err, response) {
+                if (err) throw err;
+                if (answer.amount > response[0].stock) {
+                    askBuyAll(answer.itemID, response[0]);
+                } else {
+                    updateRequest(answer.itemID, parseInt(answer.amount), response[0]);
+                }
+            });
+        });
+}
 
-            if (answer.amount > dataArray[position].stock) {
-                askBuyAll(answer.itemID, dataArray[position].stock, dataArray[position].price)
+function updateRequest(userIdInput, userAmountInput, itemArray){
+    connection.query("UPDATE products SET sold = ? WHERE id = ?", [itemArray.sold + userAmountInput, userIdInput], function (err) {
+        if (err) throw err;
+    });
+    connection.query("UPDATE products SET stock = ? WHERE id = ?", [itemArray.stock - userAmountInput, userIdInput], function (err) {
+        if (err) throw err;
+        console.log("Order successful!")
+        console.log("The total cost of your purchase is " + (userAmountInput * itemArray.price).toFixed(2))
+        askContinue()
+    });
+}
+
+function askContinue() {
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                name: "continue",
+                message: "Would you like to continue shopping?",
+                choices: ["Yes", "No"]
+            }
+        ])
+        .then(function (answer) {
+            if (answer.continue === "Yes") {
+                selectRequest()
             } else {
-                var newStock = dataArray[position].stock - answer.amount;
-                updateRequest(answer.itemID, answer.amount, newStock, dataArray[position].price);
+                connection.end();
             }
         });
 }
 
-function updateRequest(userIdInput, userAmountInput, newStock, dataPrice){
-    connection.query(
-        "UPDATE products SET stock = ? WHERE id = ?", [newStock, userIdInput], function (err) {
-            if (err) throw err;
-            console.log("Order successful!")
-            console.log("The total cost of your purchase is " + (userAmountInput * dataPrice).toFixed(2))
-            askContinue()
-        }
-    );
-}
-
-function askContinue(){
+function askBuyAll(userIdInput, itemArray){
     inquirer
-    .prompt([
-        {
-            type: "list",
-            name: "continue",
-            message: "Would you like to continue shopping?",
-            choices: ["Yes", "No"]
-        }
-    ])
-    .then(function (answer) {
-        if(answer.continue === "Yes"){
-            selectRequest()
-        }else{
-            connection.end();
-        }
-    });
-}
-
-function askBuyAll(userIdInput, dataStock, dataPrice){
-    inquirer
-    .prompt([
-        {
-            type: "list",
-            name: "continue",
-            message: "Stock insufficient. Would you like to purchase all " + dataStock + " items instead?",
-            choices: ["Yes", "No"]
-        }
-    ])
-    .then(function (answer) {
-        if(answer.continue === "Yes"){
-            updateRequest(userIdInput, dataStock, 0, dataPrice)
-        }else{
-            askContinue();
-        }
-    });
+        .prompt([
+            {
+                type: "list",
+                name: "continue",
+                message: "Stock insufficient. Would you like to purchase all " + itemArray.stock + " items instead?",
+                choices: ["Yes", "No"]
+            }
+        ])
+        .then(function (answer) {
+            if (answer.continue === "Yes") {
+                updateRequest(userIdInput, itemArray.stock, itemArray)
+            } else {
+                askContinue();
+            }
+        });
 }
