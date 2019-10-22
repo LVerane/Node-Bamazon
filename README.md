@@ -10,12 +10,12 @@ The customer is presented with a table of the current items for sale and can buy
 Entering non-numeric values on fields that require numbers will give the user an error message and request them to enter the information again\
 After each purchase the user is asked if they would like to continue shopping
 #
-![customer-1](images/customer-1.png)
+![customer-1](image/customer-1.png)
 #
 If the customer attemps to purchase more items than the available stock he is asked if he wants to purchase all items instead\
 If the customer doesn't want to keep shopping the program ends
 #
-![customer-2](images/customer-2.png)
+![customer-2](image/customer-2.png)
 #
 ## bamazonManager.js
 This is the manager file\
@@ -35,11 +35,11 @@ While a fixed overhead cost of 40% of the price per unit is not a real life scen
 Entering non-numeric values on fields that require numbers will give the user an error message and request them to enter the information again\
 After each action the user is asked if they would like to continue
 #
-![manager-1](images/manager-1.png)
+![manager-1](image/manager-1.png)
 #
-![manager-2](images/manager-2.png)
+![manager-2](image/manager-2.png)
 #
-![manager-3](images/manager-3.png)
+![manager-3](image/manager-3.png)
 #
 ## bamazonSupervisor.js
 This is the supervisor file\
@@ -55,5 +55,5 @@ While they may enter an overhead cost other than 0 the department will be create
 Entering non-numeric values on fields that require numbers will give the user an error message and request them to enter the information again\
 After each action the user is asked if they would like to continue
 #
-![supervisor-2](images/supervisor-2.png)
+![supervisor-2](image/supervisor-2.png)
 #
