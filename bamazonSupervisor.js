@@ -52,22 +52,29 @@ function viewSales() {
     });
 }
 
-function createDepartment(){
+function createDepartment() {
     inquirer
-    .prompt([
-        {
-            name: "departmentName",
-            message: "Please enter the name of the department you would like to create"
-        }, {
-            name: "costs",
-            message: "Please enter the overhead costs of the new deparment"
-        }
-    ])
-    .then(function (answer) {
-            connection.query("INSERT INTO departments (department, over_head_costs) VALUES (?, ?)", [answer.departmentName, answer.costs], function (err) {
-                if (err) throw err;
-                console.log("Department " + answer.departmentName + " successfully created!")
-                askTask();
-            });
-    });
+        .prompt([
+            {
+                name: "departmentName",
+                message: "Please enter the name of the department you would like to create"
+            }, {
+                type: "number",
+                name: "costs",
+                message: "Please enter the overhead costs of the new deparment",
+                filter: Number
+            }
+        ])
+        .then(function (answer) {
+            if (isNaN(answer.costs)) {
+                console.log("Put a number, dummy!")
+                createDepartment();
+            } else {
+                connection.query("INSERT INTO departments (department, over_head_costs) VALUES (?, ?)", [answer.departmentName, answer.costs], function (err) {
+                    if (err) throw err;
+                    console.log("Department " + answer.departmentName + " successfully created!")
+                    askTask();
+                });
+            }
+        });
 }
